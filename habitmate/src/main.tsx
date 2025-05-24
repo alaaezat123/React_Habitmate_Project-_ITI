@@ -5,6 +5,8 @@ import { AuthProvider } from "./context/AuthContext";
 import "./index.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 
+
+
 const rootElement = document.getElementById("root");
 
 if (!rootElement) {
