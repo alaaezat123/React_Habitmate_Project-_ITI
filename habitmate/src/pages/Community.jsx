@@ -1,57 +1,110 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
+
+const dummyPosts = [
+  { id: 1, author: "Alice", content: "Just completed my 10-day streak! Feeling great!" },
+  { id: 2, author: "Bob", content: "Anyone else trying the no sugar challenge this week?" },
+  { id: 3, author: "Cathy", content: "Motivation tip: celebrate small wins every day." },
+];
 
 export default function Community() {
-  const [posts, setPosts] = useState([
-    { id: 1, author: "Alice", content: "Just completed my habit streak of 10 days!", date: "2025-05-23" },
-    { id: 2, author: "Bob", content: "Any tips on staying motivated?", date: "2025-05-22" },
-  ]);
+  const [posts, setPosts] = useState(dummyPosts);
   const [newPost, setNewPost] = useState("");
 
-  const addPost = () => {
+  const handleAddPost = () => {
     if (!newPost.trim()) return;
-    setPosts([{ id: Date.now(), author: "You", content: newPost.trim(), date: new Date().toISOString().split("T")[0] }, ...posts]);
+    setPosts([{ id: Date.now(), author: "You", content: newPost }, ...posts]);
     setNewPost("");
   };
 
   return (
-    <div style={{ maxWidth: 900, margin: "2rem auto", padding: 20, fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif" }}>
-      <h1>Community Forum</h1>
-      <p>Connect with other users, share your progress, and get inspired!</p>
-
-      <div style={{ marginTop: 30, marginBottom: 20 }}>
+    <main style={styles.container}>
+      <h1 style={styles.title}>Community Feed</h1>
+      <section style={styles.newPostSection}>
         <textarea
+          placeholder="Share something with the community..."
           value={newPost}
           onChange={(e) => setNewPost(e.target.value)}
-          placeholder="Write something to share..."
           rows={3}
-          style={{ width: "100%", padding: 12, fontSize: 16, borderRadius: 8, border: "1.5px solid #ccc", resize: "vertical" }}
+          style={styles.textArea}
+          aria-label="New community post"
         />
-        <button
-          onClick={addPost}
-          style={{
-            marginTop: 10,
-            padding: "10px 20px",
-            backgroundColor: "#0072ff",
-            color: "white",
-            border: "none",
-            borderRadius: 8,
-            cursor: "pointer",
-            fontWeight: "700",
-          }}
-        >
+        <button onClick={handleAddPost} style={styles.postButton}>
           Post
         </button>
-      </div>
+      </section>
 
-      <ul style={{ listStyle: "none", padding: 0 }}>
-        {posts.map(({ id, author, content, date }) => (
-          <li key={id} style={{ padding: 16, marginBottom: 16, backgroundColor: "#f0f8ff", borderRadius: 12, boxShadow: "0 4px 12px rgba(0,0,0,0.05)" }}>
-            <div style={{ fontWeight: "700", marginBottom: 6 }}>{author}</div>
-            <div style={{ marginBottom: 8 }}>{content}</div>
-            <small style={{ color: "#555" }}>{date}</small>
-          </li>
+      <section style={styles.postsList}>
+        {posts.map(({ id, author, content }) => (
+          <article key={id} style={styles.postCard}>
+            <p style={styles.author}>@{author}</p>
+            <p style={styles.content}>{content}</p>
+          </article>
         ))}
-      </ul>
-    </div>
+      </section>
+    </main>
   );
 }
+
+const styles = {
+  container: {
+    maxWidth: 900,
+    margin: "2rem auto",
+    padding: "0 1rem",
+    fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+    color: "#2d3748",
+  },
+  title: {
+    fontSize: "2.5rem",
+    fontWeight: "800",
+    marginBottom: "2rem",
+    textAlign: "center",
+  },
+  newPostSection: {
+    marginBottom: 32,
+    display: "flex",
+    flexDirection: "column",
+    gap: 12,
+  },
+  textArea: {
+    width: "100%",
+    padding: 16,
+    fontSize: "1.1rem",
+    borderRadius: 12,
+    border: "2px solid #ccc",
+    resize: "vertical",
+    fontFamily: "inherit",
+  },
+  postButton: {
+    alignSelf: "flex-end",
+    backgroundColor: "#00aaff",
+    border: "none",
+    padding: "0.8rem 2rem",
+    borderRadius: 40,
+    color: "#fff",
+    fontWeight: "700",
+    fontSize: "1.1rem",
+    cursor: "pointer",
+    boxShadow: "0 6px 18px rgba(0,170,255,0.5)",
+    transition: "background-color 0.3s ease",
+  },
+  postsList: {
+    display: "flex",
+    flexDirection: "column",
+    gap: 18,
+  },
+  postCard: {
+    backgroundColor: "#fff",
+    padding: 20,
+    borderRadius: 16,
+    boxShadow: "0 4px 16px rgba(0,0,0,0.1)",
+  },
+  author: {
+    fontWeight: "700",
+    marginBottom: 8,
+    color: "#0072ff",
+  },
+  content: {
+    fontSize: "1.1rem",
+    lineHeight: 1.5,
+  },
+};

@@ -1,244 +1,167 @@
-import React, { useState, useEffect, useRef } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
-import { FiHome, FiBarChart2, FiBookOpen, FiUser, FiBell, FiHeart, FiUsers, FiLogOut, FiMenu, FiX } from "react-icons/fi";
-import { motion, AnimatePresence } from "framer-motion";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { FiMenu, FiX, FiUser } from "react-icons/fi";
 
-const links = [
-  { to: "/home", label: "Home", icon: <FiHome /> },
-  { to: "/dashboard", label: "Dashboard", icon: <FiBarChart2 /> },
-  { to: "/habit-library", label: "Library", icon: <FiBookOpen /> },
-  { to: "/profile-settings", label: "Profile", icon: <FiUser /> },
-  { to: "/reminders", label: "Reminders", icon: <FiBell /> },
-  { to: "/motivation", label: "Motivation", icon: <FiHeart /> },
-  { to: "/community", label: "Community", icon: <FiUsers /> },
-];
-
-export default function NavBar({ userName, onLogout }) {
+export default function NavBar({ userName }) {
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
-  const menuRef = useRef(null);
 
-  // Close menu on outside click (mobile)
-  useEffect(() => {
-    function handleClickOutside(e) {
-      if (menuRef.current && !menuRef.current.contains(e.target)) setMenuOpen(false);
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+  const toggleMenu = () => setMenuOpen(!menuOpen);
 
   return (
-    <>
-      <nav
-        aria-label="Primary navigation"
-        style={{
-          position: "sticky",
-          top: 0,
-          zIndex: 1500,
-          backgroundColor: "#0072ff",
-          color: "#fff",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          padding: "0 2rem",
-          height: 60,
-          fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-          boxShadow: "0 6px 25px rgba(0,0,0,0.3)",
-          userSelect: "none",
-        }}
-      >
-        {/* Left: Logo */}
-        <div
-          onClick={() => navigate("/home")}
-          style={{ cursor: "pointer", fontWeight: "900", fontSize: 24, letterSpacing: 2, userSelect: "none" }}
-          tabIndex={0}
-          role="link"
-          aria-label="Go to Home"
-          onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") navigate("/home"); }}
-        >
-          HabitMate
+    <nav style={styles.nav}>
+      <div style={styles.navbarContent}>
+        <div style={styles.logoContainer} onClick={() => navigate("/home")}>
+          <span style={styles.logo}>HabitMate</span>
         </div>
 
-        {/* Desktop Links */}
-        <ul
-          style={{
-            listStyle: "none",
-            display: "flex",
-            gap: 30,
-            margin: 0,
-            padding: 0,
-          }}
-          className="desktop-menu"
-        >
-          {links.map(({ to, label, icon }) => (
-            <li key={to}>
-              <NavLink
-                to={to}
-                style={({ isActive }) => ({
-                  color: isActive ? "#00c6ff" : "white",
-                  fontWeight: isActive ? "700" : "500",
-                  textDecoration: "none",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 6,
-                  fontSize: 16,
-                  padding: "8px 0",
-                  borderBottom: isActive ? "3px solid #00c6ff" : "3px solid transparent",
-                  transition: "color 0.3s ease, border-bottom 0.3s ease",
-                })}
-                aria-current={({ isActive }) => (isActive ? "page" : undefined)}
-              >
-                {icon}
-                {label}
-              </NavLink>
-            </li>
-          ))}
-        </ul>
+        <div style={styles.rightSection}>
+          <div style={styles.userInfo} onClick={() => navigate("/profile")}>
+            <FiUser size={26} style={styles.userIcon} />
+            <span style={styles.userName}>{userName}</span>
+          </div>
 
-        {/* Right: User and Logout */}
-        <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
-          <span aria-label={`Logged in as ${userName}`} style={{ fontWeight: "600" }}>
-            {userName.split(" ")[0]}
-          </span>
           <button
-            onClick={onLogout}
-            aria-label="Logout"
-            style={{
-              backgroundColor: "transparent",
-              border: "2px solid white",
-              borderRadius: 30,
-              color: "white",
-              cursor: "pointer",
-              padding: "6px 16px",
-              fontWeight: "700",
-              fontSize: 14,
-              userSelect: "none",
-              transition: "background-color 0.3s ease",
-            }}
-            onMouseEnter={e => (e.currentTarget.style.backgroundColor = "rgba(255,255,255,0.2)")}
-            onMouseLeave={e => (e.currentTarget.style.backgroundColor = "transparent")}
+            onClick={() => { /* Add logout logic */ }}
+            style={styles.logoutButton}
           >
-            <FiLogOut size={18} style={{ marginRight: 6 }} />
             Logout
           </button>
 
-          {/* Hamburger for mobile */}
-          <button
-            onClick={() => setMenuOpen(!menuOpen)}
-            aria-label={menuOpen ? "Close menu" : "Open menu"}
-            aria-expanded={menuOpen}
-            aria-controls="mobile-menu"
-            style={{
-              background: "transparent",
-              border: "none",
-              color: "white",
-              cursor: "pointer",
-              fontSize: 28,
-              display: "none",
-              userSelect: "none",
-            }}
-            className="mobile-menu-button"
-          >
-            {menuOpen ? <FiX /> : <FiMenu />}
+          <button onClick={toggleMenu} style={styles.menuButton}>
+            {menuOpen ? <FiX size={28} /> : <FiMenu size={28} />}
           </button>
         </div>
-      </nav>
+      </div>
 
-      {/* Mobile menu */}
-      <AnimatePresence>
-        {menuOpen && (
-          <motion.nav
-            id="mobile-menu"
-            aria-label="Mobile navigation"
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            style={{
-              backgroundColor: "#0072ff",
-              overflow: "hidden",
-              padding: "1rem 2rem",
-              boxShadow: "0 6px 25px rgba(0,0,0,0.3)",
-              fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-              userSelect: "none",
-              zIndex: 1400,
-            }}
-            ref={menuRef}
-          >
-            <ul
-              style={{
-                listStyle: "none",
-                margin: 0,
-                padding: 0,
-                display: "flex",
-                flexDirection: "column",
-                gap: 20,
-              }}
-            >
-              {links.map(({ to, label, icon }) => (
-                <li key={to}>
-                  <NavLink
-                    to={to}
-                    onClick={() => setMenuOpen(false)}
-                    style={({ isActive }) => ({
-                      color: isActive ? "#00c6ff" : "white",
-                      fontWeight: isActive ? "700" : "500",
-                      textDecoration: "none",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 10,
-                      fontSize: 18,
-                      padding: "8px 0",
-                      borderBottom: isActive ? "3px solid #00c6ff" : "3px solid transparent",
-                    })}
-                    aria-current={({ isActive }) => (isActive ? "page" : undefined)}
-                  >
-                    {icon}
-                    {label}
-                  </NavLink>
-                </li>
-              ))}
-              <li>
-                <button
-                  onClick={() => {
-                    onLogout();
-                    setMenuOpen(false);
-                  }}
-                  style={{
-                    backgroundColor: "transparent",
-                    border: "2px solid white",
-                    borderRadius: 30,
-                    color: "white",
-                    cursor: "pointer",
-                    padding: "10px 0",
-                    width: "100%",
-                    fontWeight: "700",
-                    fontSize: 18,
-                    userSelect: "none",
-                  }}
-                  aria-label="Logout"
-                >
-                  <FiLogOut size={22} style={{ marginRight: 10 }} />
-                  Logout
-                </button>
-              </li>
-            </ul>
-          </motion.nav>
-        )}
-      </AnimatePresence>
-
-      <style>
-        {`
-          @media (max-width: 768px) {
-            .desktop-menu {
-              display: none;
-            }
-            .mobile-menu-button {
-              display: block !important;
-            }
-          }
-        `}
-      </style>
-    </>
+      {/* Side Menu (Sliding) */}
+      {menuOpen && (
+        <div style={styles.sideMenu}>
+          <button onClick={() => { navigate("/home"); setMenuOpen(false); }} style={styles.menuItem}>Home</button>
+          <button onClick={() => { navigate("/habits"); setMenuOpen(false); }} style={styles.menuItem}>Habits</button>
+          <button onClick={() => { navigate("/challenges"); setMenuOpen(false); }} style={styles.menuItem}>Challenges</button>
+          <button onClick={() => { navigate("/share-progress"); setMenuOpen(false); }} style={styles.menuItem}>Share Progress</button>
+          <button onClick={() => { navigate("/inspiration"); setMenuOpen(false); }} style={styles.menuItem}>Inspiration</button>
+        </div>
+      )}
+    </nav>
   );
 }
+
+const styles = {
+  nav: {
+    width: "100%",
+    position: "sticky",
+    top: 0,
+    backgroundColor: "#121212", // Dark base
+    color: "#fff",
+    zIndex: 1000,
+    padding: "1rem 2rem",
+    boxShadow: "0 8px 24px rgba(0, 0, 0, 0.2)",
+    borderBottom: "2px solid rgba(255, 255, 255, 0.1)", // Subtle border
+    transition: "background-color 0.3s ease-in-out",
+  },
+  navbarContent: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    maxWidth: "1200px",
+    margin: "0 auto",
+    position: "relative",
+  },
+  logoContainer: {
+    display: "flex",
+    alignItems: "center",
+    cursor: "pointer",
+    transition: "transform 0.3s ease, color 0.3s ease",
+  },
+  logo: {
+    fontSize: "2.8rem",
+    fontWeight: "700",
+    color: "#00bcd4", // Neon cyan
+    letterSpacing: "1px",
+    textTransform: "uppercase",
+    cursor: "pointer",
+    textShadow: "0 0 10px rgba(0,188,212,0.8)", // Neon glowing effect
+  },
+  rightSection: {
+    display: "flex",
+    alignItems: "center",
+    gap: "30px",
+  },
+  userInfo: {
+    display: "flex",
+    alignItems: "center",
+    gap: "10px",
+    color: "#fff",
+    fontSize: "1.1rem",
+    fontWeight: "600",
+    cursor: "pointer",
+    transition: "color 0.3s ease",
+  },
+  userIcon: {
+    color: "#FFD700", // Golden accent for the icon
+  },
+  userName: {
+    fontSize: "1.2rem",
+    fontWeight: "600",
+  },
+  logoutButton: {
+    background: "#ff3366", // Bold red accent for logout
+    color: "#fff",
+    padding: "0.6rem 1.4rem",
+    borderRadius: "25px",
+    fontSize: "1rem",
+    border: "none",
+    cursor: "pointer",
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
+    transition: "background-color 0.3s ease",
+    fontWeight: "600",
+  },
+  menuButton: {
+    background: "none",
+    border: "none",
+    color: "#fff",
+    cursor: "pointer",
+    fontSize: "2.5rem", // Larger for better touchability
+    transition: "transform 0.3s ease",
+  },
+  sideMenu: {
+    position: "absolute",
+    top: "0",
+    right: 0,
+    width: "260px",
+    backgroundColor: "#121212",
+    height: "100%",
+    display: "flex",
+    flexDirection: "column",
+    gap: "20px",
+    padding: "20px",
+    boxShadow: "-4px 0 10px rgba(0, 0, 0, 0.3)",
+    zIndex: 1000,
+    animation: "slideIn 0.3s ease-in-out",
+  },
+  menuItem: {
+    background: "none",
+    border: "none",
+    color: "#fff",
+    fontSize: "1.3rem",
+    cursor: "pointer",
+    textAlign: "left",
+    padding: "0.8rem 0",
+    transition: "color 0.3s ease-in-out",
+    fontWeight: "600",
+    borderBottom: "1px solid rgba(255, 255, 255, 0.2)", // Dividers between items
+  },
+};
+
+// Keyframes for the side menu slide-in animation
+const styleSheet = document.styleSheets[0];
+styleSheet.insertRule(`
+  @keyframes slideIn {
+    from { transform: translateX(100%); }
+    to { transform: translateX(0); }
+  }
+`, styleSheet.cssRules.length);

@@ -1,49 +1,55 @@
 import React from "react";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "./context/AuthContext";
+
 import NavBar from "./components/NavBar";
-import AuthPage from "./pages/AuthPage";
 import Home from "./pages/Home";
-import Dashboard from "./pages/Dashboard";
-import HabitLibrary from "./pages/HabitLibrary";
-import ProfileSettings from "./pages/ProfileSettings";
-import Reminders from "./pages/Reminders";
-import Motivation from "./pages/Motivation";
-import Community from "./pages/Community";
+import Habits from "./pages/Habits";
+import Challenges from "./pages/Challenges";
+import ShareProgress from "./pages/ShareProgress";
+import Inspiration from "./pages/Inspiration";
+import AuthPage from "./pages/AuthPage";
+import NotFound from "./pages/NotFound";
 
-function AppRoutes() {
-  const { currentUser, logout } = useAuth();
+export default function App() {
+  const { currentUser } = useAuth();
+  const location = useLocation();
 
-  if (!currentUser) {
-    return (
-      <Routes>
-        <Route path="" element={<AuthPage />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    );
-  }
+  // NavBar يظهر فقط لو المستخدم مسجل دخول و **الصفحة ليست AuthPage أو Home**
+  const showNavBar =
+    currentUser && location.pathname !== "/" && location.pathname !== "/home";
 
   return (
     <>
-      <NavBar userName={currentUser.displayName || currentUser.email} onLogout={logout} />
+      {showNavBar && <NavBar userName={currentUser.displayName || currentUser.email} />}
+
       <Routes>
-        <Route path="/home" element={<Home />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/habit-library" element={<HabitLibrary />} />
-        <Route path="/profile-settings" element={<ProfileSettings />} />
-        <Route path="/reminders" element={<Reminders />} />
-        <Route path="/motivation" element={<Motivation />} />
-        <Route path="/community" element={<Community />} />
-        <Route path="*" element={<Navigate to="/home" replace />} />
+        <Route
+          path="/"
+          element={
+            currentUser ? <Navigate to="/home" replace /> : <AuthPage />
+          }
+        />
+
+        {currentUser && (
+          <>
+            <Route
+              path="/home"
+              element={<Home userName={currentUser.displayName || currentUser.email} />}
+            />
+            <Route path="/habits" element={<Habits />} />
+            <Route path="/challenges" element={<Challenges />} />
+            <Route path="/share-progress" element={<ShareProgress />} />
+            <Route path="/inspiration" element={<Inspiration />} />
+          </>
+        )}
+
+        {/* لو مش مسجل دخول، إعادة توجيه أي صفحة أخرى إلى "/" */}
+        {!currentUser && <Route path="*" element={<Navigate to="/" replace />} />}
+
+        {/* صفحة 404 */}
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </>
-  );
-}
-
-export default function App() {
-  return (
-    <BrowserRouter>
-      <AppRoutes />
-    </BrowserRouter>
   );
 }
